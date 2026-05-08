@@ -410,6 +410,7 @@ fastify.post('/api/export', async (request: any, reply) => {
   await prisma.exportJob.create({
     data: {
       id: job.id,
+      projectId,
       status: 'QUEUED',
       format: formats.join(','),
     }
