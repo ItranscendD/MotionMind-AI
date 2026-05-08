@@ -1,0 +1,203 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                  String      @id @default(uuid())
+  email               String      @unique
+  name                String?
+  role                String? // Designer, Marketer, Director, Developer, Other
+  useCase             String? // Social, Broadcast, Brand, Explainers, Other
+  onboardingCompleted Boolean     @default(false)
+  tourDismissed       Boolean     @default(false)
+  workspaces          Workspace[]
+  teams               Team[]
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+}
+
+model Workspace {
+  id          String    @id @default(uuid())
+  name        String
+  ownerId     String
+  owner       User      @relation(fields: [ownerId], references: [id])
+  projects    Project[]
+  teams       Team[]
+  styleProfiles StyleProfile[]
+  webhooks      WebhookConfig[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Team {
+  id          String    @id @default(uuid())
+  name        String
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  projects    Project[]
+  users       User[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model StyleProfile {
+  id          String   @id @default(cuid())
+  name        String
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  dimensions  String?  // Stores JSON string of the 7 dimensions
+  embeddingId String?  // Reference to Pinecone/Vector storage
+  thumbnail   String?
+  tags        String?  // Comma separated tags
+  versions    StyleVersion[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model StyleVersion {
+  id          String   @id @default(cuid())
+  profileId   String
+  profile     StyleProfile @relation(fields: [profileId], references: [id])
+  dimensions  String   // JSON string
+  createdAt   DateTime @default(now())
+}
+
+model Project {
+  id          String          @id @default(uuid())
+  name        String
+  workspaceId String
+  workspace   Workspace       @relation(fields: [workspaceId], references: [id])
+  teamId      String?
+  team        Team?           @relation(fields: [teamId], references: [id])
+  versions    Version[]
+  reviewLinks ReviewLink[]
+  exportRecords ExportRecord[]
+  exportJobs    ExportJob[]
+  status        String          @default("DRAFT") // DRAFT, IN_REVIEW, APPROVED
+  templateId  String?
+  template    ProjectTemplate? @relation(fields: [templateId], references: [id])
+  approvalConfig String?      // JSON string of required approvers
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+model ExportRecord {
+  id          String   @id @default(uuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id])
+  versionId   String
+  format      String
+  resolution  String
+  fps         Int
+  url         String
+  deliveredTo String?  // JSON string
+  createdAt   DateTime @default(now())
+}
+
+model WebhookConfig {
+  id          String   @id @default(uuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  url         String
+  events      String   // JSON string of events
+  secret      String?
+  createdAt   DateTime @default(now())
+}
+
+model Version {
+  id        String    @id @default(uuid())
+  number    Int
+  projectId String
+  project   Project   @relation(fields: [projectId], references: [id])
+  sceneState String?  // JSON string of editor state
+  comments  ReviewComment[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model ReviewLink {
+  id          String   @id @default(uuid())
+  token       String   @unique
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id])
+  password    String?
+  expiry      DateTime?
+  permissions String   // JSON: { comment: boolean, approve: boolean, download: boolean }
+  createdAt   DateTime @default(now())
+}
+
+model ReviewComment {
+  id          String   @id @default(uuid())
+  versionId   String
+  version     Version  @relation(fields: [versionId], references: [id])
+  type        String   // TEXT, MARKUP, EMOJI
+  content     String
+  timestamp   Int      // in ms
+  markup      String?  // SVG string
+  authorName  String
+  isResolved  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model GenerationJob {
+  id        String   @id @default(uuid())
+  status    String // PENDING, PROCESSING, COMPLETED, FAILED
+  payload   String // JSON
+  resultUrl String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ExportJob {
+  id        String   @id @default(uuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id])
+  status    String
+  format    String
+  url       String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Asset {
+  id          String   @id @default(uuid())
+  name        String
+  type        String   // LOGO, FONT, COLOR, PRESET
+  content     String   // URL or JSON
+  scope       String   @default("WORKSPACE") // WORKSPACE, TEAM, PRIVATE
+  teamId      String?
+  tags        String?
+  createdAt   DateTime @default(now())
+}
+
+model ProjectTemplate {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  sceneState  String   // JSON
+  thumbnail   String?
+  projects    Project[]
+  createdAt   DateTime @default(now())
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  userId      String
+  action      String
+  resource    String
+  timestamp   DateTime @default(now())
+  ipAddress   String?
+}
+
+model ApiKey {
+  id          String   @id @default(uuid())
+  name        String
+  keyHash     String   @unique
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime?
+}

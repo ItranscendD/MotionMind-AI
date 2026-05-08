@@ -1,0 +1,8 @@
+packages:
+  - 'apps/*'
+allowBuilds:
+  '@clerk/shared': true
+  '@prisma/client': true
+  '@prisma/engines': true
+  msgpackr-extract: true
+  prisma: true
