@@ -1,5 +1,5 @@
 import Fastify from 'fastify';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../prisma/generated';
 import dotenv from 'dotenv';
 import { Queue } from 'bullmq';
 import IORedis from 'ioredis';
