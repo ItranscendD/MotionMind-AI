@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "builds": [{
+    "src": "apps/api/src/index.ts",
+    "use": "@vercel/node",
+    "config": { "includeFiles": ["apps/api/prisma/generated/**"] }
+  }],
+  "routes": [{ "src": "/(.*)", "dest": "apps/api/src/index.ts" }]
+}
