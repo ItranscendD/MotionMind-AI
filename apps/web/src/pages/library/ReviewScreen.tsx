@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 
 import { useParams } from "react-router-dom";
+import { API_BASE_URL } from "@/config/api";
 
 export default function ReviewScreen() {
   const { id } = useParams();
@@ -30,7 +31,7 @@ export default function ReviewScreen() {
   });
 
   React.useEffect(() => {
-    fetch(`http://localhost:3001/api/styles/jobs/${id}`)
+    fetch(`${API_BASE_URL}/api/styles/jobs/${id}`)
       .then(res => res.json())
       .then(data => {
         if (data.result) {

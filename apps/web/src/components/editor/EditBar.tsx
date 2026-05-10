@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { MessageSquare, Send, Sparkles, AlertCircle, HelpCircle } from "lucide-react";
 import { useEditor } from "@/store/EditorContext";
+import { API_BASE_URL } from "@/config/api";
 
 interface EditBarProps {
   onOpsApplied: (ops: any[], suggestions: any[]) => void;
@@ -21,7 +22,7 @@ export default function EditBar({ onOpsApplied }: EditBarProps) {
     setClarification(null);
 
     try {
-      const res = await fetch("http://localhost:3001/api/edit", {
+      const res = await fetch(`${API_BASE_URL}/api/edit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 

@@ -12,6 +12,7 @@ import {
   Target
 } from "lucide-react";
 import { useEditor } from "@/store/EditorContext";
+import { API_BASE_URL } from "@/config/api";
 
 export default function AISuggestionPanel() {
   const { state, dispatch } = useEditor();
@@ -29,7 +30,7 @@ export default function AISuggestionPanel() {
 
   const triggerScan = async () => {
     try {
-      const res = await fetch("http://localhost:3001/api/scan", {
+      const res = await fetch(`${API_BASE_URL}/api/scan`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 

@@ -12,6 +12,7 @@ import {
   AlertCircle,
   Loader2
 } from "lucide-react";
+import { API_BASE_URL } from "@/config/api";
 
 interface UploadModalProps {
   isOpen: boolean;
@@ -41,7 +42,7 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
     
     try {
       // 1. Get Upload Intent
-      const intentRes = await fetch('http://localhost:3001/api/styles/upload-intent', {
+      const intentRes = await fetch(`${API_BASE_URL}/api/styles/upload-intent`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ fileName: 'style_source.mp4', fileSize: 123456, fileType: 'video/mp4' })
@@ -49,7 +50,7 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
       const { uploadId } = await intentRes.json();
 
       // 2. Start Job
-      const jobRes = await fetch('http://localhost:3001/api/styles/jobs', {
+      const jobRes = await fetch(`${API_BASE_URL}/api/styles/jobs`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ uploadId, userId: 'user_123', workspaceId: 'ws_123', type: method })
@@ -59,7 +60,7 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
       // 3. Poll for Progress
       let p = 0;
       const interval = setInterval(async () => {
-        const statusRes = await fetch(`http://localhost:3001/api/styles/jobs/${jobId}`);
+        const statusRes = await fetch(`${API_BASE_URL}/api/styles/jobs/${jobId}`);
         const status = await statusRes.json();
         
         if (status.progress) setProgress(status.progress);

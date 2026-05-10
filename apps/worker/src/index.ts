@@ -13,6 +13,10 @@ const connection = new IORedis(process.env.REDIS_URL || 'redis://localhost:6379'
   maxRetriesPerRequest: null
 });
 
+connection.on('error', (err) => {
+  console.warn('Redis connection error in worker:', err.message);
+});
+
 const s3Client = new S3Client({
   region: process.env.AWS_REGION || 'us-east-1',
   credentials: {

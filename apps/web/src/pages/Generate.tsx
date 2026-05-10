@@ -16,6 +16,7 @@ import {
   LayoutGrid
 } from "lucide-react";
 import { useGenerationProgress } from "@/hooks/useGenerationProgress";
+import { API_BASE_URL } from "@/config/api";
 import VariantComparison from "@/components/generate/VariantComparison";
 import TraceabilityPanel from "@/components/generate/TraceabilityPanel";
 
@@ -35,7 +36,7 @@ export default function Generate() {
   ];
 
   const handleGenerate = async () => {
-    const res = await fetch("http://localhost:3001/api/generate", {
+    const res = await fetch(`${API_BASE_URL}/api/generate`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ 

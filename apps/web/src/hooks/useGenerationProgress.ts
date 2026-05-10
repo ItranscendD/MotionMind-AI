@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { API_BASE_URL } from "@/config/api";
 
 export function useGenerationProgress(jobId: string | null) {
   const [progress, setProgress] = useState(0);
@@ -9,7 +10,7 @@ export function useGenerationProgress(jobId: string | null) {
     if (!jobId) return;
 
     setStatus("queued");
-    const eventSource = new EventSource(`http://localhost:3001/api/jobs/${jobId}/stream`);
+    const eventSource = new EventSource(`${API_BASE_URL}/api/jobs/${jobId}/stream`);
 
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data);
@@ -24,7 +25,7 @@ export function useGenerationProgress(jobId: string | null) {
         eventSource.close();
         
         // Fetch final result
-        fetch(`http://localhost:3001/api/styles/jobs/${jobId}`)
+        fetch(`${API_BASE_URL}/api/styles/jobs/${jobId}`)
           .then(res => res.json())
           .then(data => setResult(data.result));
       }

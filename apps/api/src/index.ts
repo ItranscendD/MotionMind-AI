@@ -13,6 +13,10 @@ const connection = new IORedis(process.env.REDIS_URL || 'redis://localhost:6379'
   maxRetriesPerRequest: null
 });
 
+connection.on('error', (err) => {
+  console.warn('Redis connection error (expected if Redis is not configured):', err.message);
+});
+
 const styleQueue = new Queue('style-extraction', { connection });
 const renderQueue = new Queue('render-pipeline', { connection });
 
@@ -31,6 +35,10 @@ const fastify = Fastify({
 const prisma = new PrismaClient();
 
 fastify.get('/health', async (request, reply) => {
+  return { status: 'ok' };
+});
+
+fastify.get('/api/health', async (request, reply) => {
   return { status: 'ok' };
 });
 

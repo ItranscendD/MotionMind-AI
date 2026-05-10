@@ -35,6 +35,7 @@ import ReviewLinkModal from "@/components/editor/ReviewLinkModal";
 import ExportModal from "@/components/editor/ExportModal";
 import DeliveryPanel from "@/components/editor/DeliveryPanel";
 import UpsellModal from "@/components/common/UpsellModal";
+import { API_BASE_URL } from "@/config/api";
 
 function EditorContent() {
   const { state, dispatch } = useEditor();
@@ -64,7 +65,7 @@ function EditorContent() {
     }
 
     try {
-      const res = await fetch("http://localhost:3001/api/export", {
+      const res = await fetch(`${API_BASE_URL}/api/export`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ projectId: "proj_123", formats, resolution, plan: "FREE" })
@@ -74,7 +75,7 @@ function EditorContent() {
       
       // Start polling for progress (simulated SSE)
       const poll = setInterval(async () => {
-        const statusRes = await fetch(`http://localhost:3001/api/export/${data.jobId}/status`);
+        const statusRes = await fetch(`${API_BASE_URL}/api/export/${data.jobId}/status`);
         const statusData = await statusRes.json();
         
         setExportJob(prev => prev ? { ...prev, progress: statusData.progress, status: statusData.state } : null);
@@ -92,7 +93,7 @@ function EditorContent() {
 
   const triggerScan = useCallback(async () => {
     try {
-      const res = await fetch("http://localhost:3001/api/scan", {
+      const res = await fetch(`${API_BASE_URL}/api/scan`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 

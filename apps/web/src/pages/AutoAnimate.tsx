@@ -16,6 +16,7 @@ import {
   CheckCircle2
 } from "lucide-react";
 import { useGenerationProgress } from "@/hooks/useGenerationProgress";
+import { API_BASE_URL } from "@/config/api";
 
 export default function AutoAnimate() {
   const [step, setStep] = useState<"upload" | "processing" | "review" | "blend">("upload");
@@ -27,7 +28,7 @@ export default function AutoAnimate() {
 
   const handleUpload = async () => {
     setStep("processing");
-    const res = await fetch("http://localhost:3001/api/auto-animate/upload", {
+    const res = await fetch(`${API_BASE_URL}/api/auto-animate/upload`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ userId: "user_123", workspaceId: "ws_123" })
